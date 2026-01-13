@@ -29,7 +29,8 @@ public class GameObjectRunnable implements Runnable {
     @Override
     public void run() {
         try {
-            for (int i = 0; i < STEPS; i++) {
+            // 将固定步数的循环改为无限循环
+            while (!Thread.currentThread().isInterrupted()) {
                 // 检查线程是否被中断
                 if (Thread.currentThread().isInterrupted()) {
                     throw new InterruptedException();
@@ -54,21 +55,9 @@ public class GameObjectRunnable implements Runnable {
                 Thread.sleep(DELAY);
             }
         } catch (InterruptedException e) {
-            // 线程被中断，正常退出
-            System.out.println("动画线程被停止: " + getMoveTypeDescription());
-        }
-    }
-
-    public String getMoveTypeDescription() {
-        switch (moveType) {
-            case 0:
-                return "波浪轨迹";
-            case 1:
-                return "直线轨迹";
-            case 2:
-                return "X正弦轨迹";
-            default:
-                return "未知轨迹";
+            // 线程被中断，可能是暂停或删除
+            // 这里不打印消息，由调用方控制消息显示
+            Thread.currentThread().interrupt(); // 重新设置中断状态
         }
     }
 }

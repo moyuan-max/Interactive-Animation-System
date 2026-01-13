@@ -13,67 +13,67 @@ public abstract class GameObject {
     protected Color color;           // 颜色
     protected double size;           // 基础大小
     protected Random rand;
-    
+
     public GameObject() {
         this.rand = new Random();
     }
-    
+
     /**
      * 在指定位置初始化
      */
-    public void initializeAtPosition(double centerX, double centerY, 
-                                    double canvasWidth, double canvasHeight) {
+    public void initializeAtPosition(double centerX, double centerY,
+                                     double canvasWidth, double canvasHeight) {
         // 随机大小
         this.size = 30 + rand.nextDouble() * 50;
-        
+
         // 设置到指定位置（使中心点在点击位置）
         this.x = centerX - size / 2;
         this.y = centerY - size / 2;
-        
+
         // 确保在画布范围内
         if (this.x < 0) this.x = 0;
         if (this.y < 0) this.y = 0;
         if (this.x + size > canvasWidth) this.x = canvasWidth - size;
         if (this.y + size > canvasHeight) this.y = canvasHeight - size;
-        
+
         // 随机移动速度：-3到3之间
         this.dx = (rand.nextDouble() * 2) - 1;
         if (Math.abs(dx) < 0.2) dx = (dx > 0) ? 0.2 : -0.2;
-        
+
         this.dy = (rand.nextDouble() * 2) - 1;
         if (Math.abs(dy) < 0.2) dy = (dy > 0) ? 0.2 : -0.2;
-        
+
         // 随机颜色
         this.color = new Color(
-            rand.nextInt(256),
-            rand.nextInt(256),
-            rand.nextInt(256)
+                rand.nextInt(256),
+                rand.nextInt(256),
+                rand.nextInt(256)
         );
     }
-    
+
     /**
      * 普通随机初始化
      */
     public void initializeRandom(double width, double height) {
         // 随机大小
         this.size = 30 + rand.nextDouble() * 50;
-        
+
         // 随机初始位置：在画布范围内
         this.x = rand.nextDouble() * (width - size * 2);
         this.y = rand.nextDouble() * (height - size * 2);
-        
+
         // 随机移动速度
         this.dx = (rand.nextDouble() * 2) - 1;  // -1到1
         if (Math.abs(dx) < 0.2) dx = (dx > 0) ? 0.2 : -0.2;
 
         this.dy = (rand.nextDouble() * 2) - 1;  // -1到1
         if (Math.abs(dy) < 0.2) dy = (dy > 0) ? 0.2 : -0.2;
-        
+
         // 随机颜色
         this.color = new Color(
-            rand.nextInt(256),
-            rand.nextInt(256),
-            rand.nextInt(256)
+                rand.nextInt(256),
+                rand.nextInt(256),
+                rand.nextInt(256)
         );
     }
 
@@ -141,29 +141,29 @@ public abstract class GameObject {
         }
     }
 
-    
+
     /**
      * 获取形状宽度
      */
     protected abstract double getWidth();
-    
+
     /**
      * 获取形状高度
      */
     protected abstract double getHeight();
-    
+
     /**
      * 获取形状
      */
     public abstract Shape getShape();
-    
+
     /**
      * 获取颜色
      */
     public Color getColor() {
         return color;
     }
-    
+
     /**
      * 设置位置
      */
@@ -171,7 +171,7 @@ public abstract class GameObject {
         this.x = x;
         this.y = y;
     }
-    
+
     /**
      * 设置中心位置
      */

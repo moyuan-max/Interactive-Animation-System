@@ -27,6 +27,8 @@ public class ShapeComponent extends JComponent {
     private GameObject hoveredObject = null;
     private Cursor defaultCursor = null;
 
+    private ConcurrentHashMap<GameObject, Boolean> pausedObjects = new ConcurrentHashMap<>();
+
     public ShapeComponent() {
         setBackground(Color.WHITE);
         setOpaque(true);
@@ -228,23 +230,50 @@ public class ShapeComponent extends JComponent {
      * 切换动画状态（停止/恢复）
      */
     private void toggleAnimation(GameObject obj) {
+        if (obj == null) return;
+
+        // 检查是否处于暂停状态
+        boolean isPaused = pausedObjects.containsKey(obj) && pausedObjects.get(obj);
+
+        if (isPaused) {
+            // 恢复动画
+            resumeAnimation(obj);
+            pausedObjects.put(obj, false);
+            showResumeMessage(obj);
+        } else {
+            // 暂停动画
+            pauseAnimation(obj);
+            pausedObjects.put(obj, true);
+            showPauseMessage(obj);
+        }
+    }
+
+    private void pauseAnimation(GameObject obj) {
         GameObjectRunnable runnable = animationThreads.get(obj);
         if (runnable != null) {
             Thread thread = threads.get(obj);
             if (thread != null && thread.isAlive()) {
-                // 停止动画
+                // 中断线程但不移除，以便恢复
                 thread.interrupt();
-                threads.remove(obj);
-                animationThreads.remove(obj);
-                showStopMessage(obj);
-
-                // 为停止的图形添加视觉效果
-                repaint();
-            } else {
-                // 重新启动动画
-                startAnimation(obj);
-                showStartMessage(obj);
             }
+        }
+    }
+
+    // 新增：恢复动画的方法
+    private void resumeAnimation(GameObject obj) {
+        // 检查是否已有运行中的线程
+        if (animationThreads.containsKey(obj) && threads.containsKey(obj)) {
+            Thread thread = threads.get(obj);
+            if (thread != null && !thread.isAlive()) {
+                // 重新创建并启动线程
+                GameObjectRunnable runnable = animationThreads.get(obj);
+                Thread newThread = new Thread(runnable);
+                threads.put(obj, newThread);
+                newThread.start();
+            }
+        } else {
+            // 如果没有线程，则创建新的
+            startAnimation(obj);
         }
     }
 
@@ -258,8 +287,10 @@ public class ShapeComponent extends JComponent {
             if (thread != null && thread.isAlive()) {
                 thread.interrupt();
             }
-            threads.remove(obj);
+            // 完全移除所有引用
             animationThreads.remove(obj);
+            threads.remove(obj);
+            pausedObjects.remove(obj);
         }
     }
 
@@ -372,6 +403,8 @@ public class ShapeComponent extends JComponent {
         // 保存线程引用以便控制
         animationThreads.put(obj, runnable);
         threads.put(obj, thread);
+        // 初始化为非暂停状态
+        pausedObjects.put(obj, false);
     }
 
     public void clearAll() {
@@ -393,12 +426,14 @@ public class ShapeComponent extends JComponent {
             objects.clear();
             animationThreads.clear();
             threads.clear();
+            pausedObjects.clear();
             hoveredObject = null;
             setCursor(defaultCursor);
             repaint();
             showTemporaryMessage("已清空所有图形");
         }
     }
+
 
     @Override
     public void paintComponent(Graphics g) {
@@ -412,8 +447,11 @@ public class ShapeComponent extends JComponent {
                 RenderingHints.VALUE_ANTIALIAS_ON);
 
         for (GameObject obj : objects) {
-            // 检查是否为停止状态
-            boolean isRunning = animationThreads.containsKey(obj);
+            // 检查是否处于暂停状态
+            boolean isPaused = pausedObjects.containsKey(obj) && pausedObjects.get(obj);
+            boolean isRunning = animationThreads.containsKey(obj) &&
+                    threads.containsKey(obj) &&
+                    threads.get(obj).isAlive() && !isPaused;
 
             // 绘制填充
             g2.setColor(obj.getColor());
@@ -432,17 +470,17 @@ public class ShapeComponent extends JComponent {
                     g2.fill(obj.getShape());
                 }
             } else {
-                // 停止状态 - 红色虚线边框
+                // 暂停状态 - 红色虚线边框
                 Stroke dashed = new BasicStroke(2, BasicStroke.CAP_BUTT,
                         BasicStroke.JOIN_BEVEL, 0, new float[]{5}, 0);
                 g2.setStroke(dashed);
                 g2.setColor(Color.RED);
                 g2.draw(obj.getShape());
 
-                // 在停止的图形上添加文字提示
+                // 在暂停的图形上添加文字提示
                 g2.setColor(Color.BLACK);
                 g2.setFont(new Font("微软雅黑", Font.BOLD, 12));
-                String text = "已停止";
+                String text = "已暂停";
                 Rectangle2D bounds = obj.getShape().getBounds2D();
                 int textX = (int)bounds.getCenterX() - 20;
                 int textY = (int)bounds.getCenterY() + 5;
@@ -466,6 +504,16 @@ public class ShapeComponent extends JComponent {
         }
     }
 
+    private void showPauseMessage(GameObject obj) {
+        String type = getObjectType(obj);
+        showTemporaryMessage(type + "已暂停");
+    }
+
+    private void showResumeMessage(GameObject obj) {
+        String type = getObjectType(obj);
+        showTemporaryMessage(type + "已恢复");
+    }
+
     /**
      * 获取当前图形数量
      */
@@ -480,9 +528,14 @@ public class ShapeComponent extends JComponent {
     public String getToolTipText(MouseEvent event) {
         GameObject obj = findObjectAt(event.getX(), event.getY());
         if (obj != null) {
-            boolean isRunning = animationThreads.containsKey(obj);
-            String state = isRunning ? "运行中" : "已停止";
-            String instruction = isRunning ? "单击停止" : "单击启动";
+            // 检查是否处于暂停状态
+            boolean isPaused = pausedObjects.containsKey(obj) && pausedObjects.get(obj);
+            boolean isRunning = animationThreads.containsKey(obj) &&
+                    threads.containsKey(obj) &&
+                    threads.get(obj).isAlive() && !isPaused;
+
+            String state = isPaused ? "已暂停" : (isRunning ? "运行中" : "未知状态");
+            String instruction = isPaused ? "单击恢复" : (isRunning ? "单击暂停" : "单击启动");
 
             return String.format("%s - %s (%s，双击删除)",
                     getObjectType(obj), state, instruction);
