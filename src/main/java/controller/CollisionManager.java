@@ -129,10 +129,10 @@ public class CollisionManager {
                 obj2.getY() + ny * separation * 0.5);
 
         // 反转速度方向（弹性碰撞）
-        obj1.setDx(-obj1.getDx() * 0.9);  // 添加阻尼
-        obj1.setDy(-obj1.getDy() * 0.9);
-        obj2.setDx(-obj2.getDx() * 0.9);
-        obj2.setDy(-obj2.getDy() * 0.9);
+        obj1.setDx(-obj1.getDx());  // 添加阻尼
+        obj1.setDy(-obj1.getDy());
+        obj2.setDx(-obj2.getDx());
+        obj2.setDy(-obj2.getDy());
     }
 
     /**
