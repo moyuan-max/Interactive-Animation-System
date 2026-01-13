@@ -23,8 +23,8 @@ public abstract class GameObject {
      */
     public void initializeAtPosition(double centerX, double centerY, 
                                     double canvasWidth, double canvasHeight) {
-        // 随机大小：10到30之间
-        this.size = 10 + rand.nextDouble() * 20;
+        // 随机大小
+        this.size = 30 + rand.nextDouble() * 50;
         
         // 设置到指定位置（使中心点在点击位置）
         this.x = centerX - size / 2;
@@ -55,8 +55,8 @@ public abstract class GameObject {
      * 普通随机初始化
      */
     public void initializeRandom(double width, double height) {
-        // 随机大小：20到50之间
-        this.size = 20 + rand.nextDouble() * 30;
+        // 随机大小
+        this.size = 30 + rand.nextDouble() * 50;
         
         // 随机初始位置：在画布范围内
         this.x = rand.nextDouble() * (width - size * 2);

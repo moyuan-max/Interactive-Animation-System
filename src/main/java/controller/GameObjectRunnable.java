@@ -30,6 +30,11 @@ public class GameObjectRunnable implements Runnable {
     public void run() {
         try {
             for (int i = 0; i < STEPS; i++) {
+                // 检查线程是否被中断
+                if (Thread.currentThread().isInterrupted()) {
+                    throw new InterruptedException();
+                }
+
                 // 根据随机选择的移动类型调用不同的移动方法
                 switch (moveType) {
                     case 0:
@@ -50,6 +55,7 @@ public class GameObjectRunnable implements Runnable {
             }
         } catch (InterruptedException e) {
             // 线程被中断，正常退出
+            System.out.println("动画线程被停止: " + getMoveTypeDescription());
         }
     }
 

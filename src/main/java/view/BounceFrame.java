@@ -16,6 +16,7 @@ public class BounceFrame extends JFrame {
     private ShapeComponent comp;
     public static final int DEFAULT_WIDTH = 700;
     public static final int DEFAULT_HEIGHT = 500;
+    private JLabel statusLabel;
 
     public BounceFrame() {
         setSize(DEFAULT_WIDTH, DEFAULT_HEIGHT);
@@ -27,6 +28,27 @@ public class BounceFrame extends JFrame {
         // 创建控制面板
         JPanel controlPanel = createControlPanel();
         add(controlPanel, BorderLayout.SOUTH);
+
+        // 创建状态栏
+        JPanel statusPanel = new JPanel(new BorderLayout());
+        statusPanel.setBorder(BorderFactory.createEtchedBorder());
+
+        statusLabel = new JLabel("就绪 - 单击空白区域创建图形，单击图形停止/恢复动画，双击图形删除");
+        statusLabel.setFont(new Font("微软雅黑", Font.PLAIN, 12));
+        statusPanel.add(statusLabel, BorderLayout.WEST);
+
+        // 添加图形数量标签
+        JLabel countLabel = new JLabel("图形数量: 0");
+        countLabel.setFont(new Font("微软雅黑", Font.PLAIN, 12));
+        statusPanel.add(countLabel, BorderLayout.EAST);
+
+        add(statusPanel, BorderLayout.NORTH);
+
+        // 添加定时器更新状态
+        Timer timer = new Timer(1000, e -> {
+            countLabel.setText("图形数量: " + comp.getObjectCount());
+        });
+        timer.start();
 
         // 添加提示标签
         JLabel hintLabel = new JLabel("提示：点击画布生成形状，使用单选按钮切换形状类型");
