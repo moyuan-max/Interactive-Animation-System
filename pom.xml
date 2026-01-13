@@ -16,14 +16,12 @@
     </properties>
 
     <dependencies>
-        <!-- Jackson JSON处理库 -->
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
             <version>2.15.2</version>
         </dependency>
 
-        <!-- 可选：Jackson核心库，包含在jackson-databind中，但有时需要 -->
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-core</artifactId>
@@ -33,7 +31,6 @@
 
     <build>
         <plugins>
-            <!-- 只需要编译插件 -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>

@@ -107,12 +107,15 @@ public class BounceFrame extends JFrame {
 
         // 保存按钮（新增）
         panel.add(new JSeparator(SwingConstants.VERTICAL));
-        JButton saveButton = new JButton("保存状态");
-        saveButton.addActionListener(e -> comp.manualSave());
+        JButton saveButton = new JButton("保存并退出");
+        saveButton.addActionListener(e -> {
+            comp.manualSave();
+            System.exit(0);
+        });
         panel.add(saveButton);
 
         // 关闭按钮
-        JButton closeButton = new JButton("关闭");
+        JButton closeButton = new JButton("直接退出");
         closeButton.addActionListener(e -> System.exit(0));
         panel.add(closeButton);
 
