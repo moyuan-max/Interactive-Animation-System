@@ -17,6 +17,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import storage.GameDataManager;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import javax.swing.Timer;
+
 /**
  * 形状绘制组件
  */
@@ -37,6 +42,9 @@ public class ShapeComponent extends JComponent {
     private boolean isDoubleClick = false;
     private GameObject lastClickedObject = null;
     private long lastClickTime = 0;
+    /*第7次修改，添加储存*/
+    private GameDataManager dataManager;
+    private Timer autoSaveTimer;
 
     public ShapeComponent() {
         setBackground(Color.WHITE);
@@ -85,6 +93,18 @@ public class ShapeComponent extends JComponent {
                 handleMouseMove(e);
             }
         });
+
+        // 第7次修改，添加数据管理器
+        dataManager = GameDataManager.getInstance();
+
+        // 自动加载上次保存的状态
+        autoLoadGameState();
+
+        // 设置自动保存（每30秒自动保存一次）
+        setupAutoSave();
+
+        // 添加窗口关闭监听器
+        setupAutoSave();
     }
 
     /* 恢复原有功能：处理鼠标点击 */
@@ -297,5 +317,122 @@ public class ShapeComponent extends JComponent {
         }
         super.finalize();
     }
+
+    /**
+     * 自动加载上次保存的游戏状态
+     */
+    private void autoLoadGameState() {
+        try {
+            java.util.List<GameObject> savedObjects = dataManager.loadGameState();
+            if (!((java.util.List<?>) savedObjects).isEmpty()) {
+                // 先暂停所有现有线程
+                for (GameObjectRunnable runnable : threadMap.values()) {
+                    runnable.stop();
+                }
+                threadMap.clear();
+
+                // 清空当前对象列表
+                objects.clear();
+
+                // 添加保存的对象
+                for (GameObject obj : savedObjects) {
+                    objects.add(obj);
+                    // 重新启动动画线程
+                    GameObjectRunnable runnable = new GameObjectRunnable(obj, this);
+                    Thread thread = new Thread(runnable);
+                    threadMap.put(obj, runnable);
+                    thread.start();
+                }
+
+                System.out.println("✓ 已加载上次保存的游戏状态，共 " + savedObjects.size() + " 个对象");
+                repaint();
+
+                // 显示提示信息（可选）
+                SwingUtilities.invokeLater(() -> {
+                    JOptionPane.showMessageDialog(this,
+                            "已恢复上次的游戏状态\n对象数量: " + savedObjects.size(),
+                            "状态恢复", JOptionPane.INFORMATION_MESSAGE);
+                });
+            }
+        } catch (Exception e) {
+            System.err.println("✗ 加载保存状态失败: " + e.getMessage());
+        }
+    }
+
+    /**
+     * 设置自动保存
+     */
+    private void setupAutoSave() {
+        // 每30秒自动保存一次
+        autoSaveTimer = new Timer(30000, e -> {
+            boolean success = dataManager.saveGameState(new ArrayList<>(objects));
+            if (success) {
+                System.out.println("✓ 已自动保存游戏状态 (" + objects.size() + " 个对象)");
+            }
+        });
+        autoSaveTimer.start();
+    }
+
+    /**
+     * 设置窗口关闭监听器
+     */
+    private void setupWindowCloseListener() {
+        Window parentWindow = SwingUtilities.getWindowAncestor(this);
+        if (parentWindow != null) {
+            parentWindow.addWindowListener(new WindowAdapter() {
+                @Override
+                public void windowClosing(WindowEvent e) {
+                    saveOnExit();
+                }
+            });
+        }
+    }
+
+    /**
+     * 退出时保存游戏状态
+     */
+    private void saveOnExit() {
+        autoSaveTimer.stop(); // 停止自动保存计时器
+
+        int choice = JOptionPane.showConfirmDialog(this,
+                "是否保存当前游戏状态？",
+                "保存游戏状态",
+                JOptionPane.YES_NO_CANCEL_OPTION,
+                JOptionPane.QUESTION_MESSAGE);
+
+        if (choice == JOptionPane.YES_OPTION) {
+            boolean success = dataManager.saveGameState(new ArrayList<>(objects));
+            if (success) {
+                JOptionPane.showMessageDialog(this,
+                        "游戏状态已保存到 animation_data.json",
+                        "保存成功",
+                        JOptionPane.INFORMATION_MESSAGE);
+            }
+        } else if (choice == JOptionPane.NO_OPTION) {
+            System.out.println("用户选择不保存，直接退出");
+        }
+        // CANCEL 选项会取消关闭操作
+    }
+
+    /**
+     * 手动保存游戏状态
+     */
+    public void manualSave() {
+        boolean success = dataManager.saveGameState(new ArrayList<>(objects));
+        if (success) {
+            JOptionPane.showMessageDialog(this,
+                    "游戏状态已保存\n文件: animation_data.json\n对象数量: " + objects.size(),
+                    "保存成功",
+                    JOptionPane.INFORMATION_MESSAGE);
+        } else {
+            JOptionPane.showMessageDialog(this,
+                    "保存失败，请检查文件权限",
+                    "保存失败",
+                    JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+
 }
+
 // [file content end]

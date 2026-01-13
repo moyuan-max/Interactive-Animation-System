@@ -105,31 +105,17 @@ public class BounceFrame extends JFrame {
         clearButton.addActionListener(e -> comp.clearAll());
         panel.add(clearButton);
 
+        // 保存按钮（新增）
+        panel.add(new JSeparator(SwingConstants.VERTICAL));
+        JButton saveButton = new JButton("保存状态");
+        saveButton.addActionListener(e -> comp.manualSave());
+        panel.add(saveButton);
+
         // 关闭按钮
         JButton closeButton = new JButton("关闭");
         closeButton.addActionListener(e -> System.exit(0));
         panel.add(closeButton);
 
-        // 开始/停止记录按钮
-        JButton startBtn = new JButton("开始记录");
-        JButton stopBtn = new JButton("停止记录");
-        JButton exportBtn = new JButton("导出当前");
-        JButton exportAllBtn = new JButton("导出历史");
-
-
-        panel.add(new JSeparator(SwingConstants.VERTICAL));
-
-        JButton viewLogBtn = new JButton("查看日志");
-        JButton logSnapshotBtn = new JButton("记录快照");
-
-        viewLogBtn.addActionListener(e -> LogViewer.showViewer());
-        logSnapshotBtn.addActionListener(e -> {
-            EnhancedFileLogger.getInstance().log("手动记录快照");
-            JOptionPane.showMessageDialog(this, "快照已记录到日志");
-        });
-
-        panel.add(viewLogBtn);
-        panel.add(logSnapshotBtn);
         return panel;
     }
 
