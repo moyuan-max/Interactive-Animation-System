@@ -6,6 +6,8 @@ import model.GameObject;  // 导入GameObject
 import model.Ball;        // 导入Ball
 import model.Rectangle;   // 导入Rectangle
 import model.Triangle;    // 导入Triangle
+import monitor.EnhancedFileLogger;
+import monitor.LogViewer;
 
 import javax.swing.*;
 import java.awt.*;
@@ -108,6 +110,26 @@ public class BounceFrame extends JFrame {
         closeButton.addActionListener(e -> System.exit(0));
         panel.add(closeButton);
 
+        // 开始/停止记录按钮
+        JButton startBtn = new JButton("开始记录");
+        JButton stopBtn = new JButton("停止记录");
+        JButton exportBtn = new JButton("导出当前");
+        JButton exportAllBtn = new JButton("导出历史");
+
+
+        panel.add(new JSeparator(SwingConstants.VERTICAL));
+
+        JButton viewLogBtn = new JButton("查看日志");
+        JButton logSnapshotBtn = new JButton("记录快照");
+
+        viewLogBtn.addActionListener(e -> LogViewer.showViewer());
+        logSnapshotBtn.addActionListener(e -> {
+            EnhancedFileLogger.getInstance().log("手动记录快照");
+            JOptionPane.showMessageDialog(this, "快照已记录到日志");
+        });
+
+        panel.add(viewLogBtn);
+        panel.add(logSnapshotBtn);
         return panel;
     }
 

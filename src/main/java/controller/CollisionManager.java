@@ -1,6 +1,8 @@
 package controller;
 
 import model.GameObject;
+import monitor.EnhancedFileLogger;
+
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
@@ -63,6 +65,11 @@ public class CollisionManager {
 
         // 处理物理碰撞（位移和反弹）
         processPhysicsCollision(obj1, obj2);
+
+        EnhancedFileLogger.getInstance().logCollision(
+                obj1.getClass().getSimpleName(),
+                obj2.getClass().getSimpleName()
+        );
     }
 
     /**
