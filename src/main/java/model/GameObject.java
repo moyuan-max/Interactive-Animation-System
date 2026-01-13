@@ -55,8 +55,8 @@ public abstract class GameObject {
      * 普通随机初始化
      */
     public void initializeRandom(double width, double height) {
-        // 随机大小：10到30之间
-        this.size = 10 + rand.nextDouble() * 20;
+        // 随机大小：20到50之间
+        this.size = 20 + rand.nextDouble() * 30;
         
         // 随机初始位置：在画布范围内
         this.x = rand.nextDouble() * (width - size * 2);
@@ -76,19 +76,52 @@ public abstract class GameObject {
             rand.nextInt(256)
         );
     }
-    
+
     /**
      * 移动方法 - 带波浪轨迹
      */
-    public void move(Rectangle2D bounds) {
+    public void waveMove(Rectangle2D bounds) {
         // X方向：直线运动
         x += dx;
-        
+
         // Y方向：添加波浪效果
         double wave = Math.sin(x * 0.02) * 15;
         y += dy + wave * 0.1;
-        
+
         // 边界碰撞处理
+        checkAndHandleBoundary(bounds);
+    }
+
+    /**
+     * 全直线移动
+     */
+    public void straightLineMove(Rectangle2D bounds) {
+        // X和Y方向都是直线运动
+        x += dx;
+        y += dy;
+
+        // 边界碰撞处理
+        checkAndHandleBoundary(bounds);
+    }
+
+    /**
+     * X正弦，Y直线移动
+     */
+    public void sinXMove(Rectangle2D bounds) {
+        // X方向：正弦运动
+        x += Math.sin(y * 0.03) * 2 + dx;
+
+        // Y方向：直线运动
+        y += dy;
+
+        // 边界碰撞处理
+        checkAndHandleBoundary(bounds);
+    }
+
+    /**
+     * 边界碰撞处理（通用方法）
+     */
+    private void checkAndHandleBoundary(Rectangle2D bounds) {
         if (x < bounds.getMinX()) {
             x = bounds.getMinX();
             dx = -dx;
@@ -97,7 +130,7 @@ public abstract class GameObject {
             x = bounds.getMaxX() - getWidth();
             dx = -dx;
         }
-        
+
         if (y < bounds.getMinY()) {
             y = bounds.getMinY();
             dy = -dy;
@@ -107,6 +140,7 @@ public abstract class GameObject {
             dy = -dy;
         }
     }
+
     
     /**
      * 获取形状宽度
