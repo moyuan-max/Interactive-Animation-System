@@ -168,20 +168,20 @@ public abstract class GameObject {
     private void checkAndHandleBoundary(Rectangle2D bounds) {
         if (x < bounds.getMinX()) {
             x = bounds.getMinX();
-            dx = -dx * 0.9; // 第五次修改内容：添加边界碰撞阻尼
+            dx = -dx;
         }
         if (x + getWidth() >= bounds.getMaxX()) {
             x = bounds.getMaxX() - getWidth();
-            dx = -dx * 0.9; // 第五次修改内容：添加边界碰撞阻尼
+            dx = -dx;
         }
 
         if (y < bounds.getMinY()) {
             y = bounds.getMinY();
-            dy = -dy * 0.9; // 第五次修改内容：添加边界碰撞阻尼
+            dy = -dy;
         }
         if (y + getHeight() >= bounds.getMaxY()) {
             y = bounds.getMaxY() - getHeight();
-            dy = -dy * 0.9; // 第五次修改内容：添加边界碰撞阻尼
+            dy = -dy;
         }
     }
 
