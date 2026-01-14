@@ -255,8 +255,6 @@ public abstract class GameObject {
         this.y = centerY - size / 2;
     }
 
-    /* 第五次修改内容：添加碰撞相关方法 */
-
     /**
      * 获取X坐标
      */

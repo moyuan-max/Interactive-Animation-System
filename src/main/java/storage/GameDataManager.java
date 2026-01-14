@@ -19,8 +19,8 @@ import java.util.*;
 public class GameDataManager {
     private static GameDataManager instance;
     private ObjectMapper objectMapper;
-    private static final String DATA_FILE = "D:\\others\\Interactive-Animation-System\\backups\\animation_data.json"; // 修改为主数据文件路径
-    private static final String BACKUP_DIR = "D:\\others\\Interactive-Animation-System\\backups\\"; // 修改为绝对路径
+    private static final String DATA_FILE = "animation_data.json"; // 修改为主数据文件路径
+    private static final String BACKUP_DIR = "backups\\"; // 修改为绝对路径
 
     // 其余代码保持不变
     

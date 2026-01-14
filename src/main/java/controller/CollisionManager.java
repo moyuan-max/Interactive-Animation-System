@@ -84,9 +84,6 @@ public class CollisionManager {
      * 解决碰撞（分离两个对象）
      */
     private void resolveCollision(GameObject obj1, GameObject obj2) {
-        // 简单实现：让两个对象向相反方向移动
-        // 在实际物理引擎中，这里会使用动量守恒等物理公式
-        // 这里使用简化的分离方法
 
         // 获取重叠区域
         java.awt.geom.Rectangle2D overlap = CollisionDetector.getOverlapBounds(obj1, obj2);
@@ -129,7 +126,7 @@ public class CollisionManager {
                 obj2.getY() + ny * separation * 0.5);
 
         // 反转速度方向（弹性碰撞）
-        obj1.setDx(-obj1.getDx());  // 添加阻尼
+        obj1.setDx(-obj1.getDx());
         obj1.setDy(-obj1.getDy());
         obj2.setDx(-obj2.getDx());
         obj2.setDy(-obj2.getDy());
